@@ -1,0 +1,9 @@
+[package]
+name = "thriftc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pest = { version = "2" }
+pest_derive = { version = "2" }
+thrift_codec = "0.3"

@@ -1,0 +1,49 @@
+thrift = { WHITESPACE* ~ (namespace_definition)* ~ (exception_definition | include | function_definition | typedef | enum_definition | struct_definition | service_definition | const_definition)* ~ WHITESPACE* }
+
+namespace_definition = { "namespace" ~ identifier ~ namespace }
+
+include = { "include" ~ string_literal ~ ";"? }
+
+function_definition = { ttype ~ identifier ~ "(" ~ (parameter_list)? ~ ")" ~ (throws_clause)? ~ ";"? }
+
+throws_clause = { "throws" ~ "(" ~ (exception_list)? ~ ")" }
+exception_list = { exception ~ ("," ~ exception)* }
+exception = { field_index ~ ttype ~ identifier }
+exception_definition = { "exception" ~ identifier ~ "{" ~ parameter_list ~ ","? ~ "}" ~ ";"? }
+
+typedef = { "typedef" ~ ttype ~ identifier ~ ";"? }
+enum_definition = { "enum" ~ identifier ~ "{" ~ (enum_value ~ (enum_value_end ~ enum_value)*)? ~ enum_value_end? ~ "}" ~ ";"? }
+struct_definition = { "struct" ~ identifier ~ "{" ~ parameter_list ~ ","? ~ "}" ~ ";"? }
+service_definition = { "service" ~ identifier ~ "{" ~ (function_definition)+ ~ "}" ~ ";"? }
+const_definition = { "const" ~ ttype ~ identifier ~ "=" ~ value ~ ";"? }
+
+parameter_list = { parameter ~ ("," ~ parameter)* }
+parameter = { field_index ~ ttype ~ identifier }
+field_index = { integer ~ ":" }
+field_definition = { ttype ~ identifier ~ ";"? }
+
+
+ttype = { tboolean | tbyte | ti16 | ti32 | ti64 | tstring | tdouble | tbinary | tlist | namespace }
+	tboolean = { "bool" }
+	tbyte = { "byte" }
+	ti16 = { "i16" }
+	ti32 = { "i32" }
+	ti64 = { "i64" }
+	tdouble = { "double" }
+	tstring = { "string" }
+	tbinary = { "binary" }
+	tlist = { "list<" ~ ttype ~ ">" }
+
+
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+namespace = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_" | ".")* }
+
+value = { string_literal | integer }
+string_literal = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" } // For string literals
+integer = @{ ASCII_DIGIT+ }
+
+enum_value = { identifier ~ ( "=" ~ (integer | string_literal))? }
+enum_value_end = { "," | ";" }
+
+COMMENT = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+WHITESPACE = _{ " " | "\t" | NEWLINE }
